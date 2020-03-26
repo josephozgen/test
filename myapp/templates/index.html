@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration&Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style>
+        .container {
+            display: inline-block;
+            width: 400px;
+            vertical-align: top;
+        }
+        .error {
+            color: red;
+        }
+        .form_button{
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <form action="/register" method="post" id="register">
+            {%csrf_token%}
+            <p>First Name</p>
+            <input type="text" name="first_name">
+            <p>Last Name</p>
+            <input type="text" name="last_name">
+            <div id="email_message"></div>
+            <p>Email</p>
+            <input type="email" name="email" id="email">
+            <p>Password</p>
+            <input type="password" name="password">
+            <p>Confirm Password</p>
+            <input type="password" name="confirm_password">
+            <input type="date" name="date_hired">
+            <button type="submit" class="form_button">Submit</button>
+        </form>
+    </div>
+    <div class="container">
+        <h1>Login</h1>
+        <div id="validlogin"></div>
+        <form action="/login" method="post" id="login">
+            {%csrf_token%}
+            <p>Email</p>
+            <input type="email" name="login_email">
+            <p>Password</p>
+            <input type="password" name="login_password">
+            <button type="submit" class="form_button">Submit</button>
+        </form>
+    </div>
+    <script>
+        // onChange? or onSubmit?
+        // what should we get back? what do we do with it? partials vs. json
+        $('#email').on("keyup", function(){
+            var dataWeSend = $('#register').serialize()
+            $.post('/validemail', dataWeSend)
+            .done(function(dataFromServer) {
+                console.log(dataFromServer)
+                if(dataFromServer.msg == "false") {
+                    $("#email_message").html("<p class='error'>Email already exists</p>")
+                } else {
+                    $("#email_message").html("")
+                }
+            })
+        })
+        $('#login').on("submit", function(e) {
+            e.preventDefault()
+            $.post("/validlogin",$('#login').serialize())
+            .done(function(data){
+                if(data.msg) {
+                    window.location.href = '/dashboard'
+                } else {
+                    $('#validlogin').html(data)
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

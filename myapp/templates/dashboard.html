@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style>
+        .tables{
+            border: 2px solid black;
+        }
+        #logout{
+            margin-left: 400px;
+        }
+        #add_item{
+            margin-left: 400px
+        }
+    </style>
+</head>
+<body>
+    <h3>Hello, {{logged_in_user.first_name}}</h3>|
+    <a href="/logout" id="logout">Logout</a>
+    <h5>Your Wish List</h5>
+    <table class="tables">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Added By</th>
+                <th>Date Added</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for i in items%}
+            {% if i.creator.id == logged_in_user.id or logged_in_user in i.guests.all %}
+                <tr>
+                    <td><a href="/show/{{i.id}}">{{i.title}}</a></td>
+                    <td>{{ i.creator.first_name }}</td>
+                    <td>{{i.updated_at | date:"M d Y"}}</td>
+                    {%if i.creator.id == logged_in_user.id %}
+                    <td>
+                        <a href="/delete/{{i.id}}">Delete</a>
+                    </td>
+                    {% else %}
+                        <td>
+                            <a href="/cancel/{{i.id}}">Remove from my Wishlist</a>
+                        </td>
+                    {%endif%}
+                </tr>
+                {%endif%}
+            {%endfor%}
+        </tbody>
+    </table>
+    <h5>Other User's Wish List</h5>
+    <table class="tables">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Added BY</th>
+                <th>Date Added</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for i in items%}
+            {% if i.creator.id != logged_in_user.id and logged_in_user not in i.guests.all  %}
+                <tr>
+                    <td><a href="/show/{{i.id}}">{{i.title}}</a></td>
+                    <td>{{ i.creator.first_name }}</td>
+                    <td>{{i.updated_at | date:"M d Y"}}</td>
+                    {%if i.creator.id != logged_in_user.id %}
+                    <td>
+                        <a href="/join/{{i.id}}">Add to my Wishlist</a>
+                    </td>
+                    {%endif%}
+                </tr>
+                {%endif%}
+            {%endfor%}
+        </tbody>
+    </table>
+    <a href="/create" id="add_item">Add Item</a>
+    <script>
+        var name="{{user.first_name}}"
+        console.log(name)
+    </script>
+</body>
+</html>
